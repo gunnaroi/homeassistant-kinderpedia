@@ -34,14 +34,5 @@
       "name": "Backfill history",
       "description": "Fetch all historical weekly timelines from Kinderpedia and store them locally. This only needs to run once; subsequent weeks are archived automatically every Monday."
     }
-  },
-  "calendar_events": {
-    "school": "School",
-    "nap": "Nap"
-  },
-  "meals": {
-    "breakfast": "Breakfast",
-    "lunch": "Lunch",
-    "snack": "Snack"
   }
 }

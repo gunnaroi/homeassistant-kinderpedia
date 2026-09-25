@@ -2,12 +2,10 @@
 
 from __future__ import annotations
 
-import json
 import logging
 import re
 from datetime import date, datetime, time, timedelta
 from html import escape
-from pathlib import Path
 from typing import Any
 
 from homeassistant.components.calendar import CalendarEntity, CalendarEvent
@@ -19,6 +17,7 @@ from .const import DOMAIN
 from .coordinator import KinderpediaConfigEntry, KinderpediaDataUpdateCoordinator
 from .entity import KinderpediaChildEntity
 from .history import KinderpediaHistoryStore
+from .translations import TRANSLATIONS
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -34,36 +33,12 @@ _TRANSLATION_CACHE_KEY = f"{DOMAIN}_translations"
 
 
 def _load_translations(hass: HomeAssistant) -> dict[str, str]:
-	"""Load calendar event and meal translations for the current language."""
+	"""Get calendar event and meal translations for the current language."""
 	if _TRANSLATION_CACHE_KEY in hass.data:
 		return hass.data[_TRANSLATION_CACHE_KEY]
 
 	lang = hass.config.language or "en"
-	translation_file = Path(__file__).parent / "translations" / f"{lang}.json"
-
-	if not translation_file.exists():
-		translation_file = Path(__file__).parent / "strings.json"
-
-	try:
-		with open(translation_file) as f:
-			data = json.load(f)
-			translations = {
-				"school": data.get("calendar_events", {}).get("school", "School"),
-				"nap": data.get("calendar_events", {}).get("nap", "Nap"),
-				"breakfast": data.get("meals", {}).get("breakfast", "Breakfast"),
-				"lunch": data.get("meals", {}).get("lunch", "Lunch"),
-				"snack": data.get("meals", {}).get("snack", "Snack"),
-			}
-	except (json.JSONDecodeError, KeyError) as err:
-		_LOGGER.warning("Failed to load translations, using defaults: %s", err)
-		translations = {
-			"school": "School",
-			"nap": "Nap",
-			"breakfast": "Breakfast",
-			"lunch": "Lunch",
-			"snack": "Snack",
-		}
-
+	translations = TRANSLATIONS.get(lang, TRANSLATIONS.get("en", {}))
 	hass.data[_TRANSLATION_CACHE_KEY] = translations
 	return translations
 

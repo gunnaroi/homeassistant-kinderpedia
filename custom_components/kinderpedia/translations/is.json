@@ -34,14 +34,5 @@
       "name": "Sækja eldri gögn",
       "description": "Sækja allar eldri vikulegar tímalínur frá Kinderpedia og vista þær á tækinu. Aðeins þarf að gera þetta einu sinni; eftir það eru nýjar vikur vistaðar sjálfkrafa á hverjum mánudegi."
     }
-  },
-  "calendar_events": {
-    "school": "Skóli",
-    "nap": "Svefn"
-  },
-  "meals": {
-    "breakfast": "Morgunmatur",
-    "lunch": "Hádegismatur",
-    "snack": "Snarramatur"
   }
 }
