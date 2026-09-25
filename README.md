@@ -88,6 +88,33 @@ No parameters needed - it runs for all configured children.
 - Use the **week sensors** (`breakfast_week`, `lunch_week`, `nap_week`) with an [ApexCharts card](https://github.com/RomRider/apexcharts-card) to visualise weekly trends.
 - Use the calendar entity's **extra attributes** in template cards for a detailed breakdown of today's meals.
 
+## Multi-language Support
+
+This integration is available in multiple languages:
+
+### English
+- Calendar events: "School", "Nap"
+- Meals: "Breakfast", "Lunch", "Snack"
+- Config flow uses standard English strings
+
+### Icelandic (Íslenska) 🇮🇸
+- Calendar events: "Skóli", "Svefn"
+- Meals: "Morgunmatur", "Hádegismatur", "Snarramatur"
+- Config flow: "Tengjast Kinderpedia", "Netfang", "Lykilorð"
+- Services: "Sækja eldri gögn" (Backfill history)
+
+The integration automatically detects your Home Assistant language setting and displays content in the appropriate language.
+
+**Example Icelandic Calendar Event:**
+```
+Skóli
+21. september 2026, 08:15 - 18:00
+
+🥣 Morgunmatur (80%): Korn, Mjólk
+🍽️ Hádegismatur (90%): Kjúklingasúpa, Brauð
+🍪 Snarramatur (100%): Epli
+```
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
