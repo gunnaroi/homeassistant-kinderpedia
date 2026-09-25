@@ -19,6 +19,9 @@ _WEEK_SENSORS: tuple[tuple[str, str], ...] = (
     ("nap_week", "nap_duration"),
 )
 
+# Sensors that show today's or latest data
+_TODAY_SENSORS = ("checkout", "checkin_staff", "attendance")
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -53,6 +56,9 @@ async def async_setup_entry(
                 for slug, field in _WEEK_SENSORS
             )
             new_sensors.append(KinderpediaNewsfeedSensor(*args))
+            new_sensors.append(KinderpediaCheckoutSensor(*args))
+            new_sensors.append(KinderpediaCheckinstaffSensor(*args))
+            new_sensors.append(KinderpediaAttendanceSensor(*args))
 
         if new_sensors:
             async_add_entities(new_sensors)
@@ -166,3 +172,149 @@ class KinderpediaNewsfeedSensor(KinderpediaChildEntity, SensorEntity):
             f"📅 {item.get('date', '')}\n{item.get('summary', '')}" for item in feed[:10]
         )
         return attrs
+
+
+class KinderpediaCheckoutSensor(KinderpediaChildEntity, SensorEntity):
+    """Child's checkout/departure time for today or latest school day."""
+
+    def __init__(
+        self,
+        coordinator: KinderpediaDataUpdateCoordinator,
+        child_id: int,
+        kg_id: int,
+        device_name: str,
+        first_name: str,
+    ) -> None:
+        super().__init__(coordinator, child_id, kg_id, device_name)
+        self._attr_unique_id = f"{DOMAIN}_checkout_{child_id}_{kg_id}"
+        self._attr_name = f"{first_name.lower()} checkout time"
+
+    @property
+    def native_value(self) -> str | None:
+        day_info = self._latest_school_day()
+        if not day_info:
+            return None
+        return day_info.get("checkout")
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        day_info = self._latest_school_day()
+        attrs: dict[str, Any] = {"last_updated": self._last_updated}
+        if day_info:
+            attrs["date"] = day_info.get("date")
+            attrs["checkin"] = day_info.get("checkin")
+        return attrs
+
+    def _latest_school_day(self) -> dict | None:
+        """Return the most recent day with school activity."""
+        days = self._days
+        for date_iso in sorted(days.keys(), reverse=True):
+            day = days[date_iso]
+            if day.get("checkin") and day.get("checkin") != "unknown":
+                return day
+        return None
+
+
+class KinderpediaCheckinstaffSensor(KinderpediaChildEntity, SensorEntity):
+    """The caregiver/teacher who did check-in today or on latest school day."""
+
+    def __init__(
+        self,
+        coordinator: KinderpediaDataUpdateCoordinator,
+        child_id: int,
+        kg_id: int,
+        device_name: str,
+        first_name: str,
+    ) -> None:
+        super().__init__(coordinator, child_id, kg_id, device_name)
+        self._attr_unique_id = f"{DOMAIN}_checkin_staff_{child_id}_{kg_id}"
+        self._attr_name = f"{first_name.lower()} checkin staff"
+
+    @property
+    def native_value(self) -> str | None:
+        day_info = self._latest_school_day()
+        if not day_info:
+            return None
+        return day_info.get("checkin_staff")
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        day_info = self._latest_school_day()
+        attrs: dict[str, Any] = {"last_updated": self._last_updated}
+        if day_info:
+            attrs["date"] = day_info.get("date")
+            attrs["checkin"] = day_info.get("checkin")
+        return attrs
+
+    def _latest_school_day(self) -> dict | None:
+        """Return the most recent day with school activity."""
+        days = self._days
+        for date_iso in sorted(days.keys(), reverse=True):
+            day = days[date_iso]
+            if day.get("checkin") and day.get("checkin") != "unknown":
+                return day
+        return None
+
+
+class KinderpediaAttendanceSensor(KinderpediaChildEntity, SensorEntity):
+    """Attendance status for today or latest school day."""
+
+    def __init__(
+        self,
+        coordinator: KinderpediaDataUpdateCoordinator,
+        child_id: int,
+        kg_id: int,
+        device_name: str,
+        first_name: str,
+    ) -> None:
+        super().__init__(coordinator, child_id, kg_id, device_name)
+        self._attr_unique_id = f"{DOMAIN}_attendance_{child_id}_{kg_id}"
+        self._attr_name = f"{first_name.lower()} attendance"
+
+    @property
+    def native_value(self) -> str | None:
+        day_info = self._latest_day()
+        if not day_info:
+            return None
+        return self._get_attendance_status(day_info)
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        day_info = self._latest_day()
+        attrs: dict[str, Any] = {"last_updated": self._last_updated}
+        if day_info:
+            attrs["date"] = day_info.get("date")
+            if day_info.get("absent"):
+                attrs["reason"] = day_info.get("absence_reason", "")
+                attrs["motivated"] = day_info.get("absence_motivated", False)
+        return attrs
+
+    def _latest_day(self) -> dict | None:
+        """Return the most recent day with any data."""
+        days = self._days
+        for date_iso in sorted(days.keys(), reverse=True):
+            return days[date_iso]
+        return None
+
+    @staticmethod
+    def _get_attendance_status(day_info: dict) -> str:
+        """Determine attendance status from day info."""
+        if day_info.get("absent"):
+            return "absent"
+
+        checkin = day_info.get("checkin", "unknown")
+        if checkin == "unknown" or not checkin:
+            return "unknown"
+
+        # Check for late arrival or early departure
+        if " - " in checkin:
+            parts = checkin.split(" - ")
+            if len(parts) >= 2:
+                try:
+                    checkin_hour = int(parts[0].split(":")[0])
+                    if checkin_hour >= 9:
+                        return "late_arrival"
+                except (ValueError, IndexError):
+                    pass
+
+        return "present"

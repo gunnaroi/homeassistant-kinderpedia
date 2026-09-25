@@ -25,6 +25,7 @@ _FOOD_TYPE_MAP = {"md": "breakfast", "mp": "lunch", "mp2": "lunch", "g": "snack"
 _LUNCH_TYPES = ("mp", "mp2")
 _NAP_PATTERN = re.compile(r"\s*(\d+)\s*h\s*and\s*(\d+)\s*min")
 _NAP_PATTERN_MIN = re.compile(r"\s*(\d+)\s*min")
+_CHECKIN_PATTERN = re.compile(r"^(\d{1,2}:\d{2})\s*(?:-\s*(\d{1,2}:\d{2}))?\s*(?:-?\s*(?:by|af)\s+(.+))?$")
 
 
 def _parse_timeline(json_data: Any) -> dict[str, dict]:
@@ -70,8 +71,17 @@ def _parse_timeline(json_data: Any) -> dict[str, dict]:
 
 
 def _parse_checkin(item: dict, day_entry: dict) -> None:
-    """Fill check-in and absence details into *day_entry*."""
-    day_entry["checkin"] = item.get("subtitle", "unknown")
+    """Fill check-in, checkout, staff, and absence details into *day_entry*."""
+    checkin_text = item.get("subtitle", "unknown")
+    day_entry["checkin"] = checkin_text
+
+    # Parse check-in time, check-out time, and staff name
+    if match := _CHECKIN_PATTERN.match(checkin_text.strip()):
+        day_entry["checkin_time"] = match.group(1)
+        if match.group(2):
+            day_entry["checkout"] = match.group(2)
+        if match.group(3):
+            day_entry["checkin_staff"] = match.group(3).strip()
 
     details = item.get("details")
     presence = details.get("presence") if isinstance(details, dict) else None

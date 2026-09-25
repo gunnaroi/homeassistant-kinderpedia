@@ -19,7 +19,8 @@
       "mcp__claude-in-chrome__computer",
       "mcp__claude-in-chrome__read_page",
       "mcp__claude-in-chrome__tabs_close_mcp",
-      "Bash(python3 -m py_compile custom_components/kinderpedia/calendar.py custom_components/kinderpedia/translations.py)"
+      "Bash(python3 -m py_compile custom_components/kinderpedia/calendar.py custom_components/kinderpedia/translations.py)",
+      "Bash(python3 -m py_compile custom_components/kinderpedia/sensor.py custom_components/kinderpedia/coordinator.py)"
     ]
   }
 }
