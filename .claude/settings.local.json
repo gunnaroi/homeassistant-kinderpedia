@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cp /Users/gunnar/Downloads/strings_is.json /Users/gunnar/Downloads/homeassistant_kinderpedia-master/custom_components/kinderpedia/translations/is.json)",
+      "Bash(python -m py_compile custom_components/kinderpedia/calendar.py)",
+      "Bash(python3 -m py_compile custom_components/kinderpedia/calendar.py)",
+      "Bash(python3 -m py_compile tests/test_calendar.py)",
+      "Bash(gh auth *)",
+      "Bash(gh repo *)",
+      "Bash(git init *)",
+      "Bash(git config *)",
+      "Bash(git add *)",
+      "Bash(git commit -m 'Initial commit with Icelandic localization support *)"
+    ]
+  }
+}

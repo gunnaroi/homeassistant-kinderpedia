@@ -1,0 +1,47 @@
+{
+  "title": "Kinderpedia",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Tengjast Kinderpedia",
+        "description": "Sláðu inn innskráningarupplýsingar þínar fyrir Kinderpedia. Öll börn finnast sjálfkrafa.",
+        "data": {
+          "email": "Netfang",
+          "password": "Lykilorð"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Skrá sig aftur inn á Kinderpedia",
+        "description": "Vistaða lykilorðið fyrir {email} er ekki lengur gilt. Sláðu inn núverandi lykilorð.",
+        "data": {
+          "password": "Lykilorð"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Ógilt netfang eða lykilorð",
+      "no_children_found": "Engin virk börn fundust á þessum aðgangi",
+      "cannot_connect": "Ekki tókst að tengjast Kinderpedia",
+      "unknown": "Óvænt villa"
+    },
+    "abort": {
+      "already_configured": "Þessi Kinderpedia-aðgangur hefur þegar verið stilltur",
+      "reauth_successful": "Endurinnskráning tókst"
+    }
+  },
+  "services": {
+    "backfill_history": {
+      "name": "Sækja eldri gögn",
+      "description": "Sækja allar eldri vikulegar tímalínur frá Kinderpedia og vista þær á tækinu. Aðeins þarf að gera þetta einu sinni; eftir það eru nýjar vikur vistaðar sjálfkrafa á hverjum mánudegi."
+    }
+  },
+  "calendar_events": {
+    "school": "Skóli",
+    "nap": "Svefn"
+  },
+  "meals": {
+    "breakfast": "Morgunmatur",
+    "lunch": "Hádegismatur",
+    "snack": "Snarramatur"
+  }
+}
