@@ -34,5 +34,11 @@
       "name": "Backfill history",
       "description": "Fetch all historical weekly timelines from Kinderpedia and store them locally. This only needs to run once; subsequent weeks are archived automatically every Monday."
     }
+  },
+  "entity": {
+    "sensor": {
+      "arrival": {"name": "Arrival time"},
+      "departure": {"name": "Departure time"}
+    }
   }
 }

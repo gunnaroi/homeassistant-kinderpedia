@@ -29,6 +29,8 @@ The calendar entity also exposes **detailed attributes** for the most recent sch
 | **Lunch week** | Weekly lunch consumption percentages (Mon-Fri) for charting |
 | **Nap week** | Weekly nap durations in minutes (Mon-Fri) for charting |
 | **Newsfeed** | Latest school newsfeed post (icon: `mdi:newspaper-variant-outline`). Recent entries available as an attribute |
+| **Arrival time** | The child's recorded arrival/check-in time (Icelandic: **Innritað**) |
+| **Departure time** | The child's recorded departure/check-out time (Icelandic: **Útskráður**) |
 
 ## Installation
 

@@ -56,6 +56,7 @@ async def async_setup_entry(
                 for slug, field in _WEEK_SENSORS
             )
             new_sensors.append(KinderpediaNewsfeedSensor(*args))
+            new_sensors.append(KinderpediaArrivalSensor(*args))
             new_sensors.append(KinderpediaCheckoutSensor(*args))
             new_sensors.append(KinderpediaCheckinstaffSensor(*args))
             new_sensors.append(KinderpediaAttendanceSensor(*args))
@@ -187,7 +188,8 @@ class KinderpediaCheckoutSensor(KinderpediaChildEntity, SensorEntity):
     ) -> None:
         super().__init__(coordinator, child_id, kg_id, device_name)
         self._attr_unique_id = f"{DOMAIN}_checkout_{child_id}_{kg_id}"
-        self._attr_name = f"{first_name.lower()} checkout time"
+        self._attr_has_entity_name = True
+        self._attr_translation_key = "departure"
 
     @property
     def native_value(self) -> str | None:
@@ -211,6 +213,45 @@ class KinderpediaCheckoutSensor(KinderpediaChildEntity, SensorEntity):
         for date_iso in sorted(days.keys(), reverse=True):
             day = days[date_iso]
             if day.get("checkin") and day.get("checkin") != "unknown":
+                return day
+        return None
+
+
+class KinderpediaArrivalSensor(KinderpediaChildEntity, SensorEntity):
+    """Child's arrival/check-in time for today or the latest school day."""
+
+    def __init__(
+        self,
+        coordinator: KinderpediaDataUpdateCoordinator,
+        child_id: int,
+        kg_id: int,
+        device_name: str,
+        first_name: str,
+    ) -> None:
+        super().__init__(coordinator, child_id, kg_id, device_name)
+        self._attr_unique_id = f"{DOMAIN}_arrival_{child_id}_{kg_id}"
+        self._attr_has_entity_name = True
+        self._attr_translation_key = "arrival"
+
+    @property
+    def native_value(self) -> str | None:
+        day_info = self._latest_school_day()
+        return day_info.get("checkin_time") if day_info else None
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        day_info = self._latest_school_day()
+        attrs: dict[str, Any] = {"last_updated": self._last_updated}
+        if day_info:
+            attrs["date"] = day_info.get("date")
+            attrs["checkin"] = day_info.get("checkin")
+        return attrs
+
+    def _latest_school_day(self) -> dict | None:
+        """Return the most recent day with a recorded arrival."""
+        for date_iso in sorted(self._days.keys(), reverse=True):
+            day = self._days[date_iso]
+            if day.get("checkin_time"):
                 return day
         return None
 
