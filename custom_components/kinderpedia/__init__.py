@@ -55,7 +55,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: KinderpediaConfigEntry) 
     await coordinator.async_config_entry_first_refresh()
 
     async def _scheduled_refresh(*_args) -> None:
-        """Poll every five minutes around arrival/pickup, otherwise every 15."""
+        """Poll every two minutes around arrival/pickup, otherwise every 15."""
         now = dt_util.now()
         if now.weekday() >= 5:
             return

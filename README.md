@@ -54,7 +54,7 @@ The calendar entity also exposes **detailed attributes** for the most recent sch
 3. Enter your Kinderpedia email and password.
 4. The integration will discover all children linked to your account and create entities automatically.
 
-Data is polled every 5 minutes on weekdays from 07:55–08:40 and 15:30–16:05, and every 15 minutes at other times.
+Data is polled every 2 minutes on weekdays from 07:55–08:40 and 15:30–16:05, and every 15 minutes at other times.
 
 ## History & backfill
 
@@ -64,7 +64,7 @@ The Kinderpedia API returns one week of timeline data at a time. This integratio
 
 | Scenario | What happens | Frequency |
 |---|---|---|
-| **Polling** | Fetches the current week (`week=0`) | Every 5 minutes during weekday arrival/pickup windows; every 15 minutes otherwise |
+| **Polling** | Fetches the current week (`week=0`) | Every 2 minutes during weekday arrival/pickup windows; every 15 minutes otherwise |
 | **Weekly archive** | Archives the just-completed previous week | Once per week (Monday at 03:00) |
 | **Initial backfill** | Walks backwards through all past weeks until it reaches the first week of enrollment | Once, automatically on first install |
 | **Manual re-sync** | Triggered via the `kinderpedia.backfill_history` service | On demand |
