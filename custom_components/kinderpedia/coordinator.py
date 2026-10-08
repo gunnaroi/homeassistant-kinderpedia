@@ -6,7 +6,7 @@ import asyncio
 import logging
 import re
 from dataclasses import dataclass
-from datetime import date as date_cls, timedelta
+from datetime import date as date_cls
 from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
@@ -16,7 +16,7 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 from homeassistant.util.dt import utcnow
 
 from .api import KinderpediaAPI, KinderpediaAuthError, KinderpediaConnectionError
-from .const import UPDATE_INTERVAL_MINUTES, WEEKDAY_NAMES
+from .const import WEEKDAY_NAMES
 from .history import KinderpediaHistoryStore
 
 _LOGGER = logging.getLogger(__name__)
@@ -224,7 +224,9 @@ class KinderpediaDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             _LOGGER,
             config_entry=config_entry,
             name="Kinderpedia Coordinator",
-            update_interval=timedelta(minutes=UPDATE_INTERVAL_MINUTES),
+            # Polling is scheduled by async_setup_entry so it can run more
+            # frequently during the school arrival and pickup windows.
+            update_interval=None,
         )
 
     async def _async_update_data(self) -> dict[str, Any]:

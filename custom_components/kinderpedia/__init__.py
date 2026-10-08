@@ -11,7 +11,12 @@ from homeassistant.helpers.event import async_track_time_change
 from homeassistant.util import dt as dt_util
 
 from .api import KinderpediaAPI, KinderpediaAuthError, KinderpediaConnectionError
-from .const import DOMAIN, PLATFORMS
+from .const import (
+    DOMAIN,
+    PLATFORMS,
+    PRIORITY_UPDATE_INTERVAL_MINUTES,
+    UPDATE_INTERVAL_MINUTES,
+)
 from .coordinator import (
     KinderpediaConfigEntry,
     KinderpediaDataUpdateCoordinator,
@@ -48,6 +53,32 @@ async def async_setup_entry(hass: HomeAssistant, entry: KinderpediaConfigEntry) 
         hass, api, initial_children=children, config_entry=entry
     )
     await coordinator.async_config_entry_first_refresh()
+
+    async def _scheduled_refresh(*_args) -> None:
+        """Poll every five minutes around arrival/pickup, otherwise every 15."""
+        now = dt_util.now()
+        if now.weekday() >= 5:
+            return
+
+        minute_of_day = now.hour * 60 + now.minute
+        priority_windows = (
+            (7 * 60 + 55, 8 * 60 + 40),
+            (15 * 60 + 30, 16 * 60 + 5),
+        )
+        in_priority_window = any(
+            start <= minute_of_day <= end for start, end in priority_windows
+        )
+        interval = (
+            PRIORITY_UPDATE_INTERVAL_MINUTES
+            if in_priority_window
+            else UPDATE_INTERVAL_MINUTES
+        )
+        if now.minute % interval == 0:
+            await coordinator.async_request_refresh()
+
+    entry.async_on_unload(
+        async_track_time_change(hass, _scheduled_refresh, second=0)
+    )
 
     entry.runtime_data = KinderpediaRuntimeData(
         api=api, coordinator=coordinator, history_stores=history_stores

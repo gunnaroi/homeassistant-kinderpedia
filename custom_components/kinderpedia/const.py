@@ -16,6 +16,7 @@ REQUEST_TIMEOUT = 30
 
 # How often the coordinator polls the API.
 UPDATE_INTERVAL_MINUTES = 15
+PRIORITY_UPDATE_INTERVAL_MINUTES = 5
 
 SCHOOL_WEEKDAYS = ["monday", "tuesday", "wednesday", "thursday", "friday"]
 WEEKDAY_NAMES = [*SCHOOL_WEEKDAYS, "saturday", "sunday"]
